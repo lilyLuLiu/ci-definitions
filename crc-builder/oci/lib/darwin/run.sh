@@ -121,12 +121,12 @@ git clone https://github.com/code-ready/admin-helper.git
 admin_version_line=$(cat admin-helper/crc-admin-helper.spec.in | grep Version:)
 admin_version=${admin_version_line##*:} 
 admin_version=$(echo $admin_version | xargs)
-make -C admin-helper macos-universal VERSION=$admin_version
+sudo make -C admin-helper macos-universal VERSION=$admin_version
 
 # Build vfkit
 git clone https://github.com/code-ready/vfkit.git
 git -C vfkit checkout $vfkitSCMRef
-make -C vfkit all
+sudo make -C vfkit all
 
 # Build pkg
 pushd crc
@@ -140,7 +140,7 @@ cp ./../vfkit/vf.entitlements custom_embedded/vf.entitlements
 sed -i '' "s/crcAdminHelperVersion =.*/crcAdminHelperVersion = \"${admin_version}\"/g" pkg/crc/version/version.go
 
 # create pkg
-make out/macos-universal/crc-macos-installer.pkg NO_CODESIGN=1 CUSTOM_EMBED=true EMBED_DOWNLOAD_DIR=custom_embedded
+sudo make out/macos-universal/crc-macos-installer.pkg NO_CODESIGN=1 CUSTOM_EMBED=true EMBED_DOWNLOAD_DIR=custom_embedded
 # check sum
 pushd out/macos-universal 
 shasum -a 256 * > crc-macos-installer.sha256sum
