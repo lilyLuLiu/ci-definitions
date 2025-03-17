@@ -12,7 +12,7 @@ freshEnv='true'
 download='true'
 install='false'
 debug='false'
-
+delete='false'
 
 while [[ $# -gt 0 ]]; do
     key="$1"
@@ -49,6 +49,11 @@ while [[ $# -gt 0 ]]; do
         ;;
         -install)
         install="$2"
+        shift 
+        shift 
+        ;;
+        -delete)
+        delete="$2"
         shift 
         shift 
         ;;
@@ -108,6 +113,13 @@ if [[ $download == "true" ]]; then
             echo "Error with downloading $aName"
             exit 1
         fi
+    fi
+
+    # Remove old folders
+    if [[ $delete == 'true' ]]; then
+        echo "removing 10 days ago folders"
+        cd ..
+        find . -maxdepth 1 -type d -mtime +10 -exec rm -r {} \;
     fi
 fi
 
