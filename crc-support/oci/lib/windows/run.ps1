@@ -11,6 +11,8 @@ param(
     $freshEnv='false',
     [Parameter(HelpMessage='download if False not download. Default True')]
     $download='true',
+    [Parameter(HelpMessage='delete the previous downloaded folders. Default False')]
+    $delete='false',
     [Parameter(HelpMessage='install after downloading if False not install. Default False')]
     $install='false'
 )
@@ -104,6 +106,12 @@ if ($download) {
             popd
             Write-Host "Error with downloaded binary"
             Exit
+        }
+        
+        if ($delete) {
+            cd ..
+            Write-Host "removing 10 days ago folders "
+            Get-ChildItem -Path . -Directory | Where-Object {($_.LastWriteTime -lt (Get-Date).AddDays(-10))} | Remove-Item -Recurse -Force
         }
     }
 }
