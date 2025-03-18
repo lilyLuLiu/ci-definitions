@@ -68,6 +68,9 @@ spec:
     - name: force-fresh
       description: controls if preparer will remove any previous existing crc version
       default: 'true'
+    - name: delete
+      description: controls if preparer will remove the previous downloaded folders
+      default: 'false'
     - name: debug
       description: increase verbosity
       default: 'false'
@@ -104,18 +107,26 @@ spec:
         runner="run.ps1"
       fi
       # Path for assets on remote target
-      tPath='/Users/${TARGET_HOST_USERNAME}/OpenshiftLocal'
+      tPath="/Users/${TARGET_HOST_USERNAME}/OpenshiftLocal"
       if [[ $(params.os) == 'linux' ]]; then
         tPath="/home/${TARGET_HOST_USERNAME}/OpenshiftLocal"
       fi
+      
+      
       if [[ $(params.asset-name) == *'.crcbundle' ]]; then
         # It is bundle
         name=$(params.asset-name)
         nameArr=(${name//_/ })
-        tPath+="/bundle/${nameArr[2]}"
+        if [[ $(params.asset-name) == *'microshift'* ]]; then
+          tPath+="/bundle/microshift/${nameArr[3]}"
+        else
+          tPath+="/bundle/openshift/${nameArr[2]}"
+        fi
       else
-        tPath+='/crc/$(params.crc-version)'
+        tPath+="/crc/$(params.crc-version)"
       fi
+
+
 
       cmd="${TARGET_FOLDER}/${runner} -targetPath $tPath "
       cmd+="-aBaseURL $(params.asset-base-url) "
@@ -124,7 +135,7 @@ spec:
       cmd+="-freshEnv $(params.force-fresh) "
       cmd+="-download $(params.download) "
       cmd+="-install $(params.install) "
-      cmd+="-debug $(params.debug) "
+      cmd+="-delete $(params.delete) "
       
       # Exec
       . entrypoint.sh "${cmd}"
