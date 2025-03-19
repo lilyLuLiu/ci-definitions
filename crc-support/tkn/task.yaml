@@ -17,9 +17,17 @@ spec:
     This task will prepare a target host with valid openshift local related assets
 
     It will download and install an specific Openshift Local version or can be used to download a specific bundle
-
-  workspaces:
-    - name: host-info
+  volumes:
+    - name: host-secret
+      secret:
+        secretName: $(params.secret-host)
+  
+  params:
+    # OS parameter
+    - name: os
+      description: type of platform per target host (windows, darwin or linux). Default linux
+      default: linux
+    - name: secret-host
       description: |
         ocp secret holding the hsot info credentials. Secret should be accessible to this task.
         ---
@@ -32,20 +40,13 @@ spec:
         type: Opaque
         data:
           host: XXXX
-          user: XXXX
+          username: XXXX
           password: XXXX
-          key: XXXX
+          id_rsa: XXXX
           platform: XXXX
           os-version: XXXX
           arch: XXXX
           os: XXXX
-      mountPath: /opt/host/
-  
-  params:
-    # OS parameter
-    - name: os
-      description: type of platform per target host (windows, darwin or linux). Default linux
-      default: linux
     # Assets parameter
     - name: asset-base-url
       description: base url for the asset to be downloaded
@@ -83,6 +84,9 @@ spec:
   - name: preparer
     image: quay.io/crc-org/ci-crc-support:v2.0.0-dev-$(params.os) 
     imagePullPolicy: Always
+    volumeMounts:
+      - name: host-secret
+        mountPath: /opt/host
     script: |
       #!/bin/bash
 
@@ -94,8 +98,8 @@ spec:
       SECONDS=0
       DEBUG=$(params.debug)
       TARGET_HOST=$(cat /opt/host/host)
-      TARGET_HOST_USERNAME=$(cat /opt/host/user)
-      cp /opt/host/key id_rsa
+      TARGET_HOST_USERNAME=$(cat /opt/host/username)
+      cp /opt/host/id_rsa id_rsa
       chmod 600 id_rsa
       TARGET_HOST_KEY_PATH=id_rsa
       TARGET_FOLDER=crc-support-$RANDOM$RANDOM
