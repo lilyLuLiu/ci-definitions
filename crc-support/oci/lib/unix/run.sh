@@ -115,12 +115,6 @@ if [[ $download == "true" ]]; then
         fi
     fi
 
-    # Remove old folders
-    if [[ $delete == 'true' ]]; then
-        echo "removing 10 days ago folders"
-        cd ..
-        find . -maxdepth 1 -type d -mtime +10 -exec rm -r {} \;
-    fi
 fi
 
 # INSTALLATION
@@ -128,5 +122,14 @@ if [[ $install == 'true' ]]; then
     echo "installing crc"
     installCRC $aName
 fi 
+
+# Remove old folders
+if [[ $delete == 'true' ]]; then
+    cd ..
+    ls -lh
+    echo "removing 10 days ago folders"
+    find . -maxdepth 1 -type d -mtime +10 -exec rm -r {} \;
+    ls -lh
+fi
 
 popd
