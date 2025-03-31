@@ -87,6 +87,9 @@ if ($freshEnv) {
     Force-Fresh-Environment
 }
 
+if (Test-Path $targetPath -PathType Container) {
+    Remove-Item -Path $targetPath -Recurse -Force
+}
 New-Item -Path $targetPath -ItemType Directory -Force
 pushd $targetPath
 

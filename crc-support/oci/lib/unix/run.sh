@@ -92,6 +92,9 @@ if [[ $freshEnv == 'true' ]]; then
     force_fresh_environment
 fi
 
+if [ -d "$targetPath" ];then
+ rm -rf "$targetPath"
+fi
 mkdir -p $targetPath
 pushd $targetPath
 
