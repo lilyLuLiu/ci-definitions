@@ -113,8 +113,19 @@ if ($download) {
 if ($delete) {
     cd ..
     ls
-    Write-Host "removing 10 days ago folders "
-    Get-ChildItem -Path . -Directory | Where-Object {($_.LastWriteTime -lt (Get-Date).AddDays(-10))} | Remove-Item -Recurse -Force
+    Write-Host "removing 21 days ago folders "
+    Get-ChildItem -Directory | ForEach-Object {
+        $dir = $_.FullName
+
+        # Find the latest modified file in the directory
+        $latest_file = Get-ChildItem -Path $dir -File | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+        # Check if the latest file is older than 21 days
+        if ($latest_file.LastWriteTime -lt (Get-Date).AddDays(-21)) {
+            Write-Output "Removing directory: $dir"
+            Remove-Item -Path $dir -Recurse -Force
+        }
+    }
     ls
     pushd $targetPath
 }
