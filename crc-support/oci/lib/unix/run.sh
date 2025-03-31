@@ -127,8 +127,16 @@ fi
 if [[ $delete == 'true' ]]; then
     cd ..
     ls -lh
-    echo "removing 10 days ago folders"
-    find . -maxdepth 1 -type d -mtime +10 -exec rm -r {} \;
+    echo "removing 21 days ago folders"
+    for dir in */; do
+        # find the latest changed file
+        latest_file=`ls -t $dir | head -n 1`
+        # Check if the latest file is older than 21 days
+        if find $dir/$latest_file -type f -mtime +21 | grep -q .; then
+            echo "removing  $dir"
+            rm -r $dir
+        fi
+    done
     ls -lh
 fi
 
