@@ -150,3 +150,13 @@ ifndef IMAGE
 endif
 	$(TOOLS_BINDIR)/tkn bundle push $(IMAGE)-tkn \
 		-f crc-support/tkn/task.yaml
+
+
+#### s3-uploader ####
+
+.PHONY: s3-uploder-tkn-create
+
+S3_IMAGE ?= $(shell sed -n 1p s3-uploader/release-info)
+S3_VERSION ?= v$(shell sed -n 2p s3-uploader/release-info)
+s3-uploader-tkn-create:
+	$(call tkn_template,$(S3_IMAGE),$(S3_VERSION),s3-uploader,task)
