@@ -1,5 +1,5 @@
 # main
-FROM quay.io/devtools-qe-incubator/deliverest:v0.0.7
+FROM quay.io/devtools-qe-incubator/deliverest:v0.0.8
 
 LABEL org.opencontainers.image.authors="CRCQE <devtools-crc-qe@redhat.com>"
 
