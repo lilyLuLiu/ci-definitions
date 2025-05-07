@@ -17,9 +17,18 @@ spec:
     This task will prepare a target host with valid openshift local related assets
 
     It will download and install an specific Openshift Local version or can be used to download a specific bundle
-
-  workspaces:
-    - name: host-info
+  volumes:
+    - name: host-secret
+      secret:
+        secretName: $(params.secret-host)
+    - name: orsa-asset      
+  
+  params:
+    # OS parameter
+    - name: os
+      description: type of platform per target host (windows, darwin or linux). Default linux
+      default: linux
+    - name: secret-host
       description: |
         ocp secret holding the hsot info credentials. Secret should be accessible to this task.
         ---
@@ -32,23 +41,20 @@ spec:
         type: Opaque
         data:
           host: XXXX
-          user: XXXX
+          username: XXXX
           password: XXXX
-          key: XXXX
+          id_rsa: XXXX
           platform: XXXX
           os-version: XXXX
           arch: XXXX
           os: XXXX
-      mountPath: /opt/host/
-  
-  params:
-    # OS parameter
-    - name: os
-      description: type of platform per target host (windows, darwin or linux). Default linux
-      default: linux
     # Assets parameter
     - name: asset-base-url
       description: base url for the asset to be downloaded
+      default: ""
+    - name: asset-oras-address
+      description: the oras address of the asset
+      default: ""
     - name: asset-name
       description: name for the asset to be downloaded
     - name: asset-shasum-name
@@ -80,11 +86,30 @@ spec:
       description: Path on target host where the item has been dowloaded
     
   steps:
+  - name: oras-pull
+    image: ghcr.io/oras-project/oras:v1.2.3
+    imagePullPolicy: Always
+    when:
+      - input: "$(params.asset-oras-address)"
+        operator: notin
+        values: [""]
+    volumeMounts:
+      - name: orsa-asset
+        mountPath: /workspace
+    args: 
+      - pull
+      - $(params.asset-oras-address) 
   - name: preparer
     image: cimage:cversion-$(params.os) 
     imagePullPolicy: Always
+    volumeMounts:
+      - name: host-secret
+        mountPath: /opt/host
+      - name: orsa-asset
+        mountPath: /opt/asset
     script: |
       #!/bin/bash
+      set -x
 
       if [ "$(params.debug)" = "true" ]; then
         set -xuo 
@@ -94,8 +119,8 @@ spec:
       SECONDS=0
       DEBUG=$(params.debug)
       TARGET_HOST=$(cat /opt/host/host)
-      TARGET_HOST_USERNAME=$(cat /opt/host/user)
-      cp /opt/host/key id_rsa
+      TARGET_HOST_USERNAME=$(cat /opt/host/username)
+      cp /opt/host/id_rsa id_rsa
       chmod 600 id_rsa
       TARGET_HOST_KEY_PATH=id_rsa
       TARGET_FOLDER=crc-support-$RANDOM$RANDOM
@@ -126,14 +151,30 @@ spec:
         tPath+="/crc/$(params.crc-version)"
       fi
 
+      download=$(params.download)
+      if [[ "$(params.asset-oras-address)" != "" ]]; then
+        if [[ -f /opt/asset/$(params.asset-name) ]]; then
+          echo "copy $(params.asset-name) to /opt/crc-support" 
+          cp /opt/asset/$(params.asset-name) /opt/crc-support
+          ls /opt/crc-support
+          download="false"
+          
+          tPath="/Users/${TARGET_HOST_USERNAME}/${TARGET_FOLDER}"
+          if [[ $(params.os) == 'linux' ]]; then
+            tPath="/home/${TARGET_HOST_USERNAME}/${TARGET_FOLDER}"
+          fi
 
+        else
+          echo "$(params.asset-name) not found"
+        fi
+      fi 
 
       cmd="${TARGET_FOLDER}/${runner} -targetPath $tPath "
       cmd+="-aBaseURL $(params.asset-base-url) "
       cmd+="-aName $(params.asset-name) "
       cmd+="-aSHAName $(params.asset-shasum-name) "
       cmd+="-freshEnv $(params.force-fresh) "
-      cmd+="-download $(params.download) "
+      cmd+="-download $download "
       cmd+="-install $(params.install) "
       cmd+="-delete $(params.delete) "
       
@@ -150,4 +191,5 @@ spec:
       limits:
         memory: "140Mi"
         cpu: "100m"
+    timeout: 60m
   
