@@ -19,6 +19,7 @@ jobs:
       - name: Prepare runner
         shell: bash
         run: |
+          sudo apt-get update
           sudo apt-get install -y qemu-user-static
 
       - name: Build image for PR
