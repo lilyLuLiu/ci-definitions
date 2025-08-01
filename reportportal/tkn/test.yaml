@@ -1,0 +1,25 @@
+apiVersion: tekton.dev/v1
+kind: TaskRun
+metadata:
+  name: reportportal-test
+spec:
+  taskRef:
+    resolver: git
+    params:
+      - name: url
+        value: https://github.com/lilyLuLiu/ci-definitions
+      - name: revision
+        value: main
+      - name: pathInRepo
+        value: reportportal/tkn/import.yaml
+  params:
+    - name: secret-reportportal
+      value: reportportal-crc
+    - name: oras-address
+      value: "quay.io/rhn_support_lul/crc-test:reportportal"
+    - name: results-id
+      value: "test"
+    - name: upload-log
+      value: "false"
+    - name: pipelinerunName
+      value: "mypipeline"
