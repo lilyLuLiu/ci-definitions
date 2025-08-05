@@ -82,7 +82,10 @@ spec:
         region = $(cat /opt/aws-credentials/region)
         EOF
 
-        aws s3 cp --recursive /opt/results/$(params.qe-workspace-subpath)/ s3://$(params.s3-bucket)/$(params.s3-path)
+        region=$(cat /opt/aws-credentials/region)
+        echo $region
 
-        echo -n "https://$(params.s3-bucket).s3.amazonaws.com/$(params.s3-path)/e2e-junit.xml" | tee $(results.e2e-junit-url.path)
-        echo -n "https://$(params.s3-bucket).s3.amazonaws.com/$(params.s3-path)/integration-junit.xml" | tee $(results.integration-junit-url.path)        
+        aws s3 cp --recursive /opt/results/$(params.qe-workspace-subpath)/ s3://$(params.s3-bucket)/$(params.s3-path)
+        
+        echo -n "https://$(params.s3-bucket).s3.${region}.amazonaws.com/$(params.s3-path)/e2e-junit.xml" | tee $(results.e2e-junit-url.path)
+        echo -n "https://$(params.s3-bucket).s3.${region}.amazonaws.com/$(params.s3-path)/integration-junit.xml" | tee $(results.integration-junit-url.path)        
