@@ -168,7 +168,7 @@ spec:
           - name: url
             value: https://github.com/redhat-developer/mapt.git
           - name: revision
-            value: v0.9.6
+            value: main
           - name: pathInRepo
             value: tkn/infra-aws-fedora.yaml
       params:
@@ -192,6 +192,8 @@ spec:
           value: 'true'
         - name: tags
           value: "pipelinerunName=$(context.pipelineRun.name)"
+        - name: spot-increase-rate
+          value: '30'
       timeout: "20m" 
     # We need to have the host-info as a workspace
     # https://github.com/redhat-developer/mapt/issues/319  
@@ -396,7 +398,7 @@ spec:
           - name: url
             value: https://github.com/redhat-developer/mapt.git
           - name: revision
-            value: v0.9.6
+            value: main
           - name: pathInRepo
             value: tkn/infra-aws-fedora.yaml
       params:
