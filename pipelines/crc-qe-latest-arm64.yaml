@@ -240,6 +240,7 @@ spec:
               
               mkdir -p ${work_folder}
               cp "${workspace_path}/${KEY_FILENAME}" ${work_folder}/id_rsa 
+              chmod 600 ${work_folder}/id_rsa 
 
               # Set results
               cat "${workspace_path}/${HOST_FILENAME}" | tee $(results.host.path)   
