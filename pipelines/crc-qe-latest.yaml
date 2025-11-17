@@ -433,6 +433,7 @@ spec:
 
               mkdir -p /opt/storage/$(params.ws-output-path)
               cp /opt/host-info/id_rsa /opt/storage/$(params.ws-output-path)/id_rsa 
+              chmod 600 /opt/storage/$(params.ws-output-path)/id_rsa
               cat /opt/host-info/host | tee $(results.host.path)  
               cat /opt/host-info/username | tee $(results.username.path)
               cat /opt/host-info/os | tee $(results.os.path)
