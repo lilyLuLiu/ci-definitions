@@ -4,7 +4,7 @@ kind: Pipeline
 metadata:
   name: snc-builder
   labels:
-    app.kubernetes.io/version: "cversion"
+    app.kubernetes.io/version: "v1.0.2"
     redhat.com/product: openshift-local
     dev.lifecycle.io/phase: build
     openshift-local.redhat.com/component: bundle
@@ -218,7 +218,7 @@ spec:
           - name: url
             value: https://github.com/crc-org/ci-definitions.git
           - name: revision
-            value: snc-runner-cversion
+            value: snc-runner-v1.0.2
           - name: pathInRepo
             value: snc-runner/tkn/task.yaml
       params:
@@ -329,19 +329,13 @@ spec:
                   - name: rh-credentials
                     value: credentials-rh-subs-crcqe-prod
                   - name: id
-                    value: $(tasks.preparer.results.correlation)
+                    value: $(params.correlation)
                   - name: ownerKind
                     value: PipelineRun
-                  - name: ownerName
-                    value: $(context.pipelineRun.name)
-                  - name: ownerUid
-                    value: $(context.pipelineRun.uid)
                   - name: operation
                     value: destroy
                   - name: ws-output-path
                     value: ci-snc-runner/$(params.correlation)
-                  - name: debug
-                    value: $(params.debug)
                 timeout: "20m" 
               EOF
 
