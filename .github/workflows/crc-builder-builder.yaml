@@ -2,7 +2,9 @@ name: crc-builder-builder
 
 on:
   push:
-    tags: [ 'crc-builder-v*' ]       
+    tags: [ 'crc-builder-v*' ]
+    branches: [ main ]    
+    paths: ['Makefile', 'crc-builder/**', '.github\/workflows\/crc-builder*' ]    
   pull_request:
     branches: [ main ]
     paths: ['Makefile', 'crc-builder/**', '.github\/workflows\/crc-builder*' ]
